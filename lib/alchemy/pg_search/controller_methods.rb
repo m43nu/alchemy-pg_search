@@ -48,12 +48,14 @@ module Alchemy
       #
       def search_results
         pages = Page.published.contentpages.with_language(Language.current.id)
+        # As a temporary fix for nested_elements (fairmed goes live 2016-11-22) we get page_ids from elements-search
+        page_ids = Alchemy::Element.available.search(params[:query]).collect(&:page).uniq
         # Since CanCan cannot (oh the irony) merge +accessible_by+ scope with pg_search scopes,
         # we need to fake a page object here
         if can? :show, Alchemy::Page.new(restricted: true, public_on: Date.current)
-          pages.search(params[:query])
+          pages.where(id: page_ids)
         else
-          pages.not_restricted.search(params[:query])
+          pages.not_restricted.where(id: page_ids)
         end
       end
 
