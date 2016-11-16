@@ -47,7 +47,7 @@ module Alchemy
       # @return [Array]
       #
       def search_results
-        pages = Page.published.contentpages.with_language(Language.current.id)
+        pages = Page.published.contentpages.with_language(Language.current.id).order(:lft)
         # As a temporary fix for nested_elements (fairmed goes live 2016-11-22) we get page_ids from elements-search
         page_ids = Alchemy::Element.available.search(params[:query]).collect(&:page).uniq
         # Since CanCan cannot (oh the irony) merge +accessible_by+ scope with pg_search scopes,
